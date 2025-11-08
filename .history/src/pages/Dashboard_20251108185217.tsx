@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { ChatMessage } from "@/components/ChatMessage";
-import { useAuth0 } from "@auth0/auth0-react";   // ✅ Added
-import { useNavigate } from "react-router-dom";   // ✅ Added
+import { CodeBlock } from "@/components/CodeBlock";
 
 interface Message {
   id: string;
@@ -15,9 +14,6 @@ interface Message {
 }
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated, loginWithRedirect } = useAuth0();   // ✅ Added
-
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -25,7 +21,6 @@ const Dashboard = () => {
       sender: "bot",
     },
   ]);
-
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -150,27 +145,8 @@ The Gemini API translated this into a MongoDB aggregation pipeline and I've anal
     }, 2000);
   };
 
-  // ✅ NEW — Lets user proceed to Querypage
-  const handleContinue = () => {
-    if (!isAuthenticated) {
-      loginWithRedirect({
-        appState: { returnTo: "/Querypage" },
-      });
-    } else {
-      navigate("/Querypage");
-    }
-  };
-
   return (
     <div className="flex h-[calc(100vh-73px)] w-full flex-col bg-secondary/30">
-
-      {/* ✅ Continue Button */}
-      <div className="flex justify-center p-4">
-        <Button onClick={handleContinue}>
-          {isAuthenticated ? "Go to Query Page" : "Log in to Continue"}
-        </Button>
-      </div>
-
       {/* Chat Window */}
       <div className="flex-1 space-y-6 overflow-y-auto p-6 lg:p-10 code-window">
         {messages.map((message) => (

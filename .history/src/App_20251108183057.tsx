@@ -5,14 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
-import Querypage from "./pages/Querypage";
-import { withAuthenticationRequired } from "@auth0/auth0-react";
 
 const queryClient = new QueryClient();
-
-// ✅ Protect Querypage only
-const ProtectedQuerypage = withAuthenticationRequired(Querypage);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,14 +19,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-
-          {/* ✅ Public landing */}
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
-
-          {/* ✅ Protected route */}
-          <Route path="/Querypage" element={<ProtectedQuerypage />} />
-
-          {/* ✅ Catch-all */}
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

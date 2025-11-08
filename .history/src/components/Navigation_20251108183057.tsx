@@ -1,21 +1,31 @@
 import { Button } from "@/components/ui/button";
-import { Database } from "lucide-react";
+import { Database, LogOut } from "lucide-react";
 import { NavLink } from "./NavLink";
-import { useLocation } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-export const Navigation = () => {
+interface NavigationProps {
+  // keep props optional for backward compatibility
+  isLoggedIn?: boolean;
+  onLogin?: () => void;
+  onLogout?: () => void;
+}
+
+export const Navigation = ({ isLoggedIn: _isLoggedIn, onLogin, onLogout }: NavigationProps) => {
+  const [isLogged, setIsLogged] = useState<boolean>(false);
   const location = useLocation();
-  const { isAuthenticated, user, loginWithRedirect, logout } = useAuth0();
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    loginWithRedirect({
-      appState: { returnTo: "/Querypage" },   // ✅ After login → redirect to Querypage
-    });
-  };
+  useEffect(() => {
+    // simple localStorage-based auth flag so navigation updates when route changes
+    setIsLogged(localStorage.getItem("loggedIn") === "true");
+  }, [location]);
 
   const handleLogout = () => {
-    logout({ logoutParams: { returnTo: window.location.origin } });
+    localStorage.removeItem("loggedIn");
+    setIsLogged(false);
+    onLogout?.();
+    navigate("/");
   };
 
   return (
@@ -30,51 +40,47 @@ export const Navigation = () => {
         </NavLink>
 
         {/* Navigation Links */}
-        {!isAuthenticated ? (
+        {!isLogged ? (
           <div className="flex items-center space-x-6">
-
             <a
               href="#features"
               className="hidden text-sm font-medium text-muted-foreground hover:text-primary transition-colors md:block"
             >
               Features
             </a>
-
             <a
               href="#tech-stack"
               className="hidden text-sm font-medium text-muted-foreground hover:text-primary transition-colors md:block"
             >
               Tech Stack
             </a>
-
             <a
               href="#use-cases"
               className="hidden text-sm font-medium text-muted-foreground hover:text-primary transition-colors md:block"
             >
               Use Cases
             </a>
-
-            {/* ✅ Auth0 Login Button */}
-            <Button
-              onClick={handleLogin}
-              className="gradient-primary-hover shadow-glow hover:shadow-glow-lg transition-all duration-300"
-            >
-              Log In
-            </Button>
+            <NavLink to="/signin" className="text-sm font-medium">
+              <Button variant="ghost" className="text-sm font-medium">
+                Sign In
+              </Button>
+            </NavLink>
+            <NavLink to="/signup">
+              <Button className="gradient-primary-hover shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                Sign Up
+              </Button>
+            </NavLink>
           </div>
         ) : (
           <div className="flex items-center space-x-6">
             <NavLink to="/dashboard" className="text-sm font-medium">
               <span className="text-sm font-medium text-foreground">Dashboard</span>
             </NavLink>
-
-            {/* ✅ Show user info */}
             <span className="text-sm font-medium text-foreground">
-              Welcome, <span className="text-primary">{user?.name || "User"}</span>
+              Welcome, <span className="text-primary">HackCBS User!</span>
             </span>
-
-            {/* ✅ Auth0 Logout Button */}
             <Button variant="outline" onClick={handleLogout} className="gap-2">
+              <LogOut className="h-4 w-4" />
               Logout
             </Button>
           </div>
